@@ -130,7 +130,7 @@ int main(int argc, char *argv[]) {
     int a, b, i, j, d, e, z, c, f, l1, row, choice, repair, found, skip, maxJ, maxE, maxD;
     int k = 3;
 
-    stream = fopen("dat.txt", "r");
+    stream = fopen("examples/example1.txt", "r");
     if (stream == NULL) {
         fprintf(stderr, "File cannot be opened.\n");
         exit(1);

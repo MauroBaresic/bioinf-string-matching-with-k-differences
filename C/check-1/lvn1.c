@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
     int i, j, l;
     int k = 3;
 
-    stream = fopen("dat.txt", "r");
+    stream = fopen("examples/example1.txt", "r");
     if (stream == NULL) {
         fprintf(stderr, "File cannot be opened.\n");
         exit(1);

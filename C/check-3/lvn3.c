@@ -1,3 +1,5 @@
+//version: 0.2
+
 #include <malloc.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -127,7 +129,7 @@ int main(int argc, char *argv[]) {
     int m;
     int n;
 
-    int a, b, i, j, d, e, z, c, f, l1, row, choice, repair, found, skip, maxJ, maxE, maxD;
+    int a, b, i, j, d, e, z, g, c, f, l1, row, choice, repair, found, skip, maxJ, maxE, maxD;
     int k = 3;
 
     stream = fopen("examples/example1.txt", "r");
@@ -218,35 +220,49 @@ int main(int argc, char *argv[]) {
                         }
                     }
                 }
-                while(i+row+d+1<=j) {
-                    printf("test");
-                    found = 0;
-                    for (z=0; z<Sij.numTriples; z++) {
-                        if ((i+row+d+1) <= (Sij.T[z][0]+Sij.T[z][3]) &&
-                            (i+row+d+1) > Sij.T[z][0]) {
-                            repair = (i+row+d) - Sij.T[z][0];
-                            c = Sij.T[z][1] + repair;
-                            f = Sij.T[z][2] - repair;
-                            found = 1;
-                            break;
-                        }
-                    }
-                    if (found == 1) {
-                        if (f == 0) {
-                            if (text[i+row+d] != pattern[row]) {
-                                skip = 1;
-                            } else {
-                                row++;
-                            }
-                        } else {
-                            if (f != maxLength[c][row]) {
-                                row = f;
-                                if (row > maxLength[c][row]) {
-                                    row = maxLength[c][row];
+                if (row != m) {
+                    while(i+row+d+1 <= j) {
+                        found = 0;
+                        for (z=0; z<Sij.numTriples; z++) {
+                            if (Sij.T[z][2] == 0) {
+                                if ((i+row+d+1) == Sij.T[z][0]+1) {
+                                    c = 0;
+                                    f = 0;
+                                    found = 1;
+                                    break;
                                 }
-                                skip = 1;
                             } else {
-                                row += f;
+                                if ((i+row+d+1) <= (Sij.T[z][0]+Sij.T[z][2]) &&
+                                (i+row+d+1) > Sij.T[z][0]) {
+                                    repair = (i+row+d) - Sij.T[z][0];
+                                    c = Sij.T[z][1] + repair;
+                                    f = Sij.T[z][2] - repair;
+                                    found = 1;
+                                    break;
+                                }
+                            }
+                        }
+                        if (found == 1) {
+                            if (f == 0) {
+                                if (text[i+row+d] != pattern[row]) {
+                                    skip = 1;
+                                    break;
+                                } else {
+                                    row++;
+                                }
+                            } else {
+                                if (f != maxLength[c][row]) {
+                                    g = maxLength[c][row];
+                                    if (g > f) {
+                                        row += f;
+                                    } else {
+                                        row += g;
+                                    }
+                                    skip = 1;
+                                    break;
+                                } else {
+                                    row += f;
+                                }
                             }
                         }
                     }
@@ -275,6 +291,7 @@ int main(int argc, char *argv[]) {
         }
         Sij.i++;
         if (maxJ > j) {
+            j = maxJ;
             Sij.j = maxJ;
             Sij.numTriples = matL[maxD][maxE].numTriples;
             for (a=0; a<matL[maxD][maxE].numTriples; a++) {

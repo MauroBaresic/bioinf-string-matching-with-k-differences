@@ -1,3 +1,5 @@
+//version: 0.1
+
 #include <malloc.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -80,10 +82,10 @@ int main(int argc, char *argv[]) {
     int patternLength = 0;
     int textLength = 0;
 
-    int i, j, l;
+    int i, j, l, d, e, row;
     int k = 3;
 
-    stream = fopen("dat.txt", "r");
+    stream = fopen("examples/example1.txt", "r");
     if (stream == NULL) {
         fprintf(stderr, "File cannot be opened.\n");
         exit(1);
@@ -104,46 +106,44 @@ int main(int argc, char *argv[]) {
     textLength = strlen(text);
     int **maxLength = getMaxLength(pattern, patternLength);
 
-    /*for (i=0; i<patternLength; i++) {
-        for (j=0; j<patternLength; j++)
-            printf("%d ", maxLength[i][j]);
-        printf("\n");
-    }*/
-
-    int **matD = (int**) malloc((patternLength+1) * sizeof(int*));
-    for (i=0; i<patternLength+1; i++) {
-        matD[i] = malloc((patternLength+k+1) * sizeof(int));
+    int **matL = (int**) malloc(((k+1)*2+1) * sizeof(int*));
+    for (i=0; i<(k+1)*2+1; i++) {
+        matL[i] = malloc((k+3) * sizeof(int));
     }
-    for (i=0; i<patternLength+1; i++) {
-        for (j=0; j<patternLength+k+1; j++)
-            matD[i][j] = -1;
+    for (i=0; i<(k+1)*2+1; i++) {
+        for (j=0; j<k+3; j++)
+            matL[i][j] = -9;
     }
-    for (i=0; i<=textLength-patternLength+k; i++) { // <=textLength-patternLength+k
-        matD[0][0] = 0;
-        for (j=1; j<=patternLength+k; j++) {
-            matD[0][j] = j;
+    for (i=0; i<=textLength-patternLength+k; i++) {
+        for (d=-(k+1); d<=(k+1); d++) {
+            matL[d+k+1][abs(d)] = -5;
+            if (d < 0) {
+                matL[d+k+1][abs(d)+1] = abs(d) - 1;
+            } else {
+                matL[d+k+1][abs(d)+1] = -1;
+            }
         }
-        for (l=1; l<=patternLength; l++) {
-            matD[l][0] = l;
-        }
-        for (l=1; l<=patternLength; l++) {
-            for (j=1; j<=patternLength+k; j++) {
-                if (i+j <= textLength && pattern[l-1] == text[i+j-1]) {
-                    matD[l][j] = min(matD[l-1][j]+1, matD[l][j-1]+1, matD[l-1][j-1]);
-                } else {
-                    matD[l][j] = min(matD[l-1][j]+1, matD[l][j-1]+1, matD[l-1][j-1]+1);
+        for (e=0; e<=k; e++) {
+            for (d=-e; d<=e; d++) {
+                row = matL[d+k+1][e+1]+1;
+                if (row < matL[d+k][e+1]) row = matL[d+k][e+1];
+                if (row < matL[d+k+2][e+1]+1) row = matL[d+k+2][e+1]+1;
+                if (row > patternLength) {
+                    row = patternLength;
+                }
+                while(row<patternLength && i+row+d<textLength && pattern[row]==text[i+row+d]) {
+                    row += 1;
+                }
+                matL[d+k+1][e+2] = row;
+                if (matL[d+k+1][e+2] == patternLength && e == k) {
+                    printf("START: %d, STRING: %.*s\n", i+1, patternLength+d, text+i);
                 }
             }
         }
-        for (j=patternLength-k; j<=patternLength+k; j++) {
-            if (matD[patternLength][j] <= k) {
-                printf("START: %d, STRING: %.*s\n", i+1, j, text+i);
-            }
-        }
     }
-    for (i=0; i<patternLength+1; i++) {
-        for (j=0; j<patternLength+k+1; j++)
-            printf("%d ", matD[i][j]);
+    for (i=0; i<(k+1)*2+1; i++) {
+        for (j=0; j<k+3; j++)
+            printf("%d ", matL[i][j]);
         printf("\n");
     }
 
@@ -151,10 +151,10 @@ int main(int argc, char *argv[]) {
         free(maxLength[i]);
     }
     free(maxLength);
-    for(i=0; i<=patternLength; i++) {
-        free(matD[i]);
+    for(i=0; i<(k+1)*2+1; i++) {
+        free(matL[i]);
     }
-    free(matD);
+    free(matL);
     free(pattern);
     free(text);
     fclose(stream);

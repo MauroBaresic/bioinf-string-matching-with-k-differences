@@ -1,5 +1,17 @@
+# author Mauro Baresic
+# email: mauro.baresic@outlook.com
+
 import sys
 import numpy as np
+import psutil
+import os
+import time
+
+def memory_usage_psutil():
+    # return the memory usage in MB    
+    process = psutil.Process(os.getpid())
+    mem = process.get_memory_info()[0] / float(2 ** 20)
+    return str(round(mem,3)) + " MB"
 
 class MinDifferenceEfficient():
     R = ''
@@ -152,6 +164,7 @@ class MinDifferenceEfficient():
                     #6
                     if (row == self.m):
                         print "An occurence with <=",self.k,"differences of the pattern starts at",i
+                        #print memory_usage_psutil()
                         #GOTO 7 ili ne
                         
             #7
@@ -197,6 +210,7 @@ class MinDifferenceEfficient():
                     #self.MAXLENGTH[(i+d,i)] = 0
 
 if __name__ == "__main__":
+    timeStart = time.time()
     #path = sys.argv[1]
     path = "podaci.txt"
     f = open(path,'r')
@@ -213,6 +227,8 @@ if __name__ == "__main__":
     mdi = MinDifferenceEfficient(R,B)
     x1 = mdi.MAXLENGTH
     mdi.calculate(4)
+    print "Elapsed time", time.time() - timeStart, "s"
+    print memory_usage_psutil()
     """mdi.computeMAXLENGTH()
     x2 = mdi.MAXLENGTH
     for i in xrange(mdi.m):

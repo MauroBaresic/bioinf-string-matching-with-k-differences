@@ -3,15 +3,29 @@
 
 import sys
 import numpy as np
-import psutil
+#import psutil
 import os
 import time
-
+"""
 def memory_usage_psutil():
     # return the memory usage in MB    
     process = psutil.Process(os.getpid())
     mem = process.get_memory_info()[0] / float(2 ** 20)
-    return str(round(mem,3)) + " MB"
+    return str(round(mem,3))
+"""
+def parseFastaFile(path):
+    f = open(path,'r')
+    sequence = ""
+    readingSequence = False
+    for row in f.readlines():
+        if (row[0] == '>' and readingSequence == False):
+            readingSequence = True
+        elif (row[0] != '>' and readingSequence == True):
+            sequence += row.rstrip()
+        else:
+            break        
+    f.close()
+    return sequence
 
 class MinDifferenceEfficient():
     R = ''
@@ -209,26 +223,45 @@ class MinDifferenceEfficient():
                     #self.MAXLENGTH[(i,i+d)] = 0
                     #self.MAXLENGTH[(i+d,i)] = 0
 
-if __name__ == "__main__":
-    timeStart = time.time()
-    #path = sys.argv[1]
-    path = "podaci.txt"
-    f = open(path,'r')
-    rows = [row.strip() for row in f.readlines()]
+def printStatisticsToFile(path, stats):
+    f = open(path,'a')
+    line = ""
+    for x in stats:
+        line += x + "\t"
+    
+    f.write(line.rstrip() + "\n")
+
     f.close()
 
-    if (len(rows) != 2):
+if __name__ == "__main__":
+
+    k = 4
+    #path = sys.argv[1]
+    patternPath = "./Texts/pattern.fa"
+
+    """if (len(rows) != 2):
         print "Use!"
-        sys.exit()
+        sys.exit()"""
 
-    R = rows[0]
-    B = rows[1]
+    R = parseFastaFile(patternPath)
+    
+    texts = os.listdir("./Texts")
+    texts.remove("pattern.fa")
+    #texts = ["text5e1.fa", "text25e1.fa"]
+    f = open("output-python2.7.txt","w")
+    f.write("textLength\tpatternLength\tk-value\telapsedTime(sec)\n")
+    f.close()
+    for i in xrange(len(texts)):
+        timeStart = time.time()
+        B = parseFastaFile("./Texts/" + texts[i])
 
-    mdi = MinDifferenceEfficient(R,B)
-    x1 = mdi.MAXLENGTH
-    mdi.calculate(4)
-    print "Elapsed time", time.time() - timeStart, "s"
-    print memory_usage_psutil()
+        mdi = MinDifferenceEfficient(R,B)
+        x1 = mdi.MAXLENGTH
+        mdi.calculate(k)
+        elapsed_time = str(round(time.time() - timeStart,3))
+        #used_memory = memory_usage_psutil()
+        printStatisticsToFile("output-python2.7.txt", [str(len(B)), str(len(R)), str(k), elapsed_time])#, used_memory])
+    
     """mdi.computeMAXLENGTH()
     x2 = mdi.MAXLENGTH
     for i in xrange(mdi.m):

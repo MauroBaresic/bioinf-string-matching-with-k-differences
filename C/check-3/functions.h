@@ -1,7 +1,7 @@
 /* String matching algorithm with k differences for nucleotide sequences.
  * Algorithm authors: Gad M. Landau, Uzi Vishkin and Ruth Nussinov.
  *
- * version: 0.5 */
+ * version: 0.6 */
 
 #include <malloc.h>
 #include <stdio.h>
@@ -11,10 +11,20 @@
 #ifndef FUNCTIONS_H_INCLUDED
 #define FUNCTIONS_H_INCLUDED
 
-/* Read one line from FILE pointer fp and store it in string line which is passed by reference.
- * If memory cannot be allocated, print error message and set line pointer to NULL.
- * If letter is not A, C, G, or T, print error message and set line pointer to NULL. */
-void getLine(FILE *fp, char **line);
+/* Read all lines from FILE pointer fp (FASTA file) and store it in string fasta
+ * which is passed by reference.
+ * If memory cannot be allocated, print error message and set return value to -1,
+ * otherwise return 0. */
+int getFasta(FILE *fp, char **fasta);
+
+/* Read one line from FILE pointer fp and store it in string line
+ * which is passed by reference.
+ * Also store lineSize (refers to actual size, including '\n').
+ * If memory cannot be allocated, print error message and set return value to -1.
+ * If line ends with '\n', return 0. If ends with EOF, return 1.
+ * NOTE: If line ends with '\n', stored line will not get '\n'.
+ *       But if line ends with EOF, stored line will get '\n'. */
+int getLine(FILE *fp, char **line, size_t *lineSize);
 
 /* Allocate passed S structure and initialize its number of triplets to 0.
  * If memory cannot be allocated return 1, otherwise return 0. */

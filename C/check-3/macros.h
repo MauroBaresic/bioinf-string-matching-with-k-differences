@@ -1,7 +1,7 @@
 /* String matching algorithm with k differences for nucleotide sequences.
  * Algorithm authors: Gad M. Landau, Uzi Vishkin and Ruth Nussinov.
  *
- * version: 0.5 */
+ * version: 0.6 */
 
 #ifndef MACROS_H_INCLUDED
 #define MACROS_H_INCLUDED

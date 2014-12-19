@@ -1,17 +1,18 @@
 /* String matching algorithm with k differences for nucleotide sequences.
  * Algorithm authors: Gad M. Landau, Uzi Vishkin and Ruth Nussinov.
  *
- * version: 0.5 */
+ * version: 0.6 */
 
-/*#include <time.h>
+#include <time.h>
 #include "windows.h"
-#include "psapi.h"*/
+#include "psapi.h"
 
 #include <ctype.h>
 #include <malloc.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <io.h>
 
 #include "functions.h"
 #include "macros.h"
@@ -19,8 +20,8 @@
 
 int main(int argc, char *argv[]) {
 
-    /*clock_t begin, end;
-    double time_spent;*/
+    clock_t begin, end;
+    double time_spent;
 
     FILE *fp;
 
@@ -52,27 +53,35 @@ int main(int argc, char *argv[]) {
 
     int x; // auxiliary variable
 
-    //begin = clock();
+    begin = clock();
 
-    if (argc != 3) {
-        printf("Usage: lvn3 filename max_differences\n");
+    if (argc != 4) {
+        printf("Usage: lvn3 pattern file textfile max_differences\n");
         exit(1);
     }
     fp = fopen(argv[1], "r");
     if (fp == NULL) {
-        fprintf(stderr, "File cannot be opened.\n");
+        fprintf(stderr, "Pattern file cannot be opened.\n");
         exit(1);
     }
-    getLine(fp, &pattern);
-    if (pattern == NULL) {
-        exit(1);
-    }
-    getLine(fp, &text);
-    if (text == NULL) {
+    if (getFasta(fp, &pattern) == -1) {
+        printf("error");
         exit(1);
     }
     if (fclose(fp) == EOF) {
-        fprintf(stderr, "Error closing file.\n");
+        fprintf(stderr, "Error closing pattern file.\n");
+        exit(1);
+    }
+    fp = fopen(argv[2], "r");
+    if (fp == NULL) {
+        fprintf(stderr, "Text file cannot be opened.\n");
+        exit(1);
+    }
+    if (getFasta(fp, &text) == -1) {
+        exit(1);
+    }
+    if (fclose(fp) == EOF) {
+        fprintf(stderr, "Error closing text file.\n");
         exit(1);
     }
     m = strlen(pattern);
@@ -90,8 +99,8 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
     k = 0;
-    for (x=0; x<strlen(argv[2]); x++) {
-        if (!isdigit(argv[2][x])) {
+    for (x=0; x<strlen(argv[3]); x++) {
+        if (!isdigit(argv[3][x])) {
             k = -1;
             break;
         }
@@ -100,7 +109,7 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "Maximal number of differences must be positive number.\n");
         exit(1);
     }
-    k = atoi(argv[2]);
+    k = atoi(argv[3]);
     if (k >= m) {
         fprintf(stderr, "Maximal number of differences must be less than pattern length.\n");
         exit(1);
@@ -207,14 +216,24 @@ int main(int argc, char *argv[]) {
 
     printf("\nDONE\n");
 
-    /*end = clock();
+    end = clock();
     time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-    printf("\nTime spent: %f sec\n", time_spent);
+    printf("\nElapsed time: %f sec\n", time_spent);
 
     PROCESS_MEMORY_COUNTERS_EX pmc;
     GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc));
     SIZE_T physMemUsedByMe = pmc.WorkingSetSize;
-    printf("\nPhysical memory used: %d B\n", physMemUsedByMe);*/
+    printf("\nPhysical memory used: %d B\n", (int)physMemUsedByMe);
+    if (access("output.txt", F_OK) == -1) {
+        fp = fopen("output.txt", "w");
+        fprintf(fp, "textLength\tpatternLength\tk-value\telapsedTime(sec)\tmemUsage(B)");
+        fprintf(fp, "\n%d\t%d\t%d\t%f\t%d", n, m, k, time_spent, (int)physMemUsedByMe);
+        fclose(fp);
+    } else {
+        fp = fopen("output.txt", "a");
+        fprintf(fp, "\n%d\t%d\t%d\t%f\t%d", n, m, k, time_spent, (int)physMemUsedByMe);
+        fclose(fp);
+    }
 
     return 0;
 }

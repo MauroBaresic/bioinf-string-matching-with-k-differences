@@ -1,46 +1,96 @@
 /* String matching algorithm with k differences for nucleotide sequences.
  * Algorithm authors: Gad M. Landau, Uzi Vishkin and Ruth Nussinov.
  *
- * version: 0.5 */
+ * version: 0.6 */
 
 #include "functions.h"
+#include <ctype.h>
 
-void getLine(FILE *fp, char **line) {
+int getFasta(FILE *fp, char **fasta) {
 
-    char *lineOld = NULL;
-    char *lineUpdated;
+    char *tmpFasta = NULL;
+    char *tmpFastaUpdated;
+    size_t fastaSize = 0;
+
+    char *line = NULL;
+    size_t lineSize = 0;
+
+    int returnId = -1; // 0 - OK, -1 - error
+
+    int x; //auxiliary variable
+
+    while (1) {
+        returnId = getLine(fp, &line, &lineSize);
+        if (returnId == -1) {
+            break;
+        } else {
+            if (line[0] == ',' || line[0] == '>') {
+                free(line);
+                continue;
+            }
+            fastaSize += lineSize;
+            tmpFastaUpdated = realloc(tmpFasta, fastaSize);
+            if (tmpFastaUpdated == NULL) {
+                free(tmpFasta);
+                free(line);
+                fprintf(stderr, "Memory could not be allocated.\n");
+                break;
+            } else {
+                tmpFasta = tmpFastaUpdated;
+                for (x=0; x<lineSize; x++) {
+                    tmpFasta[fastaSize-lineSize+x] = line[x];
+                }
+                free(line);
+            }
+            if (returnId == 1) {
+                *fasta = tmpFasta;
+                break;
+            }
+        }
+    }
+
+    return returnId;
+}
+
+int getLine(FILE *fp, char **line, size_t *lineSize) {
+
+    char *tmpLine = NULL;
+    char *tmpLineUpdated;
+    size_t tmpLineSize = 0;
 
     char character;
-    size_t lineSize = 0;
-    int index = 0;
+    int returnId = -1; // 0 - \n, 1 - EOF, -1 - error
 
     while (1) {
         character = getc(fp);
-        lineSize += sizeof(character);
-        lineUpdated = realloc(lineOld, lineSize);
-        if (lineUpdated == NULL) {
-            free(lineOld);
-            lineOld = NULL;
-            fprintf(stderr, "Memory could not be allocated.\n");
+        if (character == '\n') {
+            returnId = 0;
+            *line = tmpLine;
+            *lineSize = tmpLineSize;
             break;
         } else {
-            lineOld = lineUpdated;
-        }
-
-        if (character == EOF || character == '\n') {
-            lineOld[index] = '\0';
-            break;
-        } else if (character != 'A' && character != 'C' && character != 'G' && character != 'T') {
-            free(lineOld);
-            lineOld = NULL;
-            fprintf(stderr, "Only characters A, C, G and T (upper case) are allowed.\n");
-            break;
-        } else {
-            lineOld[index] = character;
-            index++;
+            tmpLineSize += sizeof(character);
+            tmpLineUpdated = realloc(tmpLine, tmpLineSize);
+            if (tmpLineUpdated == NULL) {
+                free(tmpLine);
+                fprintf(stderr, "Memory could not be allocated.\n");
+                break;
+            } else {
+                tmpLine = tmpLineUpdated;
+                int index = (int) tmpLineSize - 1;
+                if (character == EOF) {
+                    tmpLine[index] = '\0';
+                    returnId = 1;
+                    *line = tmpLine;
+                    *lineSize = tmpLineSize;
+                    break;
+                } else {
+                    tmpLine[index] = toupper(character);
+                }
+            }
         }
     }
-    *line = lineOld;
+    return returnId;
 }
 
 int initializeS(int t_max, int t_length, S_t *Sij) {

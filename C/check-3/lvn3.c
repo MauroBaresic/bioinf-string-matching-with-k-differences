@@ -1,7 +1,11 @@
 /* String matching algorithm with k differences for nucleotide sequences.
  * Algorithm authors: Gad M. Landau, Uzi Vishkin and Ruth Nussinov.
  *
- * version: 0.4 */
+ * version: 0.5 */
+
+/*#include <time.h>
+#include "windows.h"
+#include "psapi.h"*/
 
 #include <ctype.h>
 #include <malloc.h>
@@ -14,6 +18,9 @@
 #include "structs.h"
 
 int main(int argc, char *argv[]) {
+
+    /*clock_t begin, end;
+    double time_spent;*/
 
     FILE *fp;
 
@@ -44,6 +51,8 @@ int main(int argc, char *argv[]) {
     int g; // MAXLENGTH(c, row)
 
     int x; // auxiliary variable
+
+    //begin = clock();
 
     if (argc != 3) {
         printf("Usage: lvn3 filename max_differences\n");
@@ -197,5 +206,15 @@ int main(int argc, char *argv[]) {
     cleanupMaxLength(m, maxLength);
 
     printf("\nDONE\n");
+
+    /*end = clock();
+    time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+    printf("\nTime spent: %f sec\n", time_spent);
+
+    PROCESS_MEMORY_COUNTERS_EX pmc;
+    GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc));
+    SIZE_T physMemUsedByMe = pmc.WorkingSetSize;
+    printf("\nPhysical memory used: %d B\n", physMemUsedByMe);*/
+
     return 0;
 }

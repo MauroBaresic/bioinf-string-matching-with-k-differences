@@ -1,10 +1,10 @@
 /* String matching algorithm with k differences for nucleotide sequences.
  * Algorithm authors: Gad M. Landau, Uzi Vishkin and Ruth Nussinov.
  *
- * version: 0.6 */
+ * author: Alen Skvaric
+ * version: 0.7 */
 
 #include "functions.h"
-#include <ctype.h>
 
 int getFasta(FILE *fp, char **fasta) {
 

@@ -2,7 +2,7 @@
  * Algorithm authors: Gad M. Landau, Uzi Vishkin and Ruth Nussinov.
  *
  * author: Alen Skvaric
- * version: 0.7 */
+ * version: 0.7.1 */
 
 #ifndef MACROS_H_INCLUDED
 #define MACROS_H_INCLUDED

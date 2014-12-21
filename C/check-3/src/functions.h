@@ -2,7 +2,7 @@
  * Algorithm authors: Gad M. Landau, Uzi Vishkin and Ruth Nussinov.
  *
  * author: Alen Skvaric
- * version: 0.7 */
+ * version: 0.7.1 */
 
 #include <malloc.h>
 #include <stdio.h>

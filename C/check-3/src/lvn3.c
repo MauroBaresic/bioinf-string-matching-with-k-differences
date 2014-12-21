@@ -2,13 +2,13 @@
  * Algorithm authors: Gad M. Landau, Uzi Vishkin and Ruth Nussinov.
  *
  * author: Alen Skvaric
- * version: 0.7 */
+ * version: 0.7.1 */
 
 //#define TEST // enable performance testing
 
 #ifdef TEST
-#include <io.h>
 #include <time.h>
+#include <unistd.h>
 #include "windows.h"
 #include "psapi.h"
 #endif // TEST
@@ -28,11 +28,11 @@ int main(int argc, char *argv[]) {
     FILE *fp;
 
     #ifdef TEST
-    char *outputPerformanceFile = "performanceOutput.txt";
+    char *outputPerformanceFile = "performanceOutput";
     #endif // TEST
 
     #ifndef TEST
-    char *outputResultFile = "resultOutput.txt";
+    char *outputResultFile = "resultOutput";
     #endif // TEST
 
     char *pattern;
@@ -239,7 +239,7 @@ int main(int argc, char *argv[]) {
                 }
                 if ((currL[D(d, k)].row==m) && (isDone==0)) { // match found
                     #ifndef TEST
-                    fprintf(fp, "%d\t%d\t%d\n", i+1, J(i, m, d), e, J(0, m, d));
+                    fprintf(fp, "%d\t%d\t%d\n", i+1, J(i, m, d), e);
                     #endif // TEST
                 }
                 if (J(i, currL[D(d, k)].row, d) > maxJ) { // store diagonal that reached the biggest j
@@ -261,14 +261,6 @@ int main(int argc, char *argv[]) {
         clearL(MAX_L(k), currL);
     }
 
-    /* Free allocated memory. */
-    free(pattern);
-    free(text);
-    cleanupS(MAX_TRIPLET(k), &Sij);
-    cleanupL(MAX_L(k), MAX_TRIPLET(k), prevL);
-    cleanupL(MAX_L(k), MAX_TRIPLET(k), currL);
-    cleanupMaxLength(m, maxLength);
-
     #ifndef TEST
     printf("\nDONE\n");
     fprintf(fp, "\nDONE\n");
@@ -289,25 +281,35 @@ int main(int argc, char *argv[]) {
     /* Get memory consumption (only for Windows) */
     PROCESS_MEMORY_COUNTERS pmc;
     GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc));
-    int memoryUsed = (int)pmc.WorkingSetSize;
-    printf("\nMemory used: %d B\n", memoryUsed);
+    int virtualMemoryUsed = (int)pmc.PagefileUsage;
+    printf("\nVirtual memory used: %d B\n", virtualMemoryUsed);
+    int physicalMemoryUsed = (int)pmc.WorkingSetSize;
+    printf("\nPhysical memory used: %d B\n", physicalMemoryUsed);
 
     /* Write performance results to outputPerformanceFile */
     if (access(outputPerformanceFile, F_OK) == -1) { // outputPerformanceFile does not exist
         fp = fopen(outputPerformanceFile, "w"); // start writing to outputPerformanceFile
-        fprintf(fp, "%-15s|%-15s|%-10s|%-20s|%-15s|\n", "textLength", "patternLength", "k-value", "elapsedTime(sec)", "memUsage(B)");
-        for (x=0; x<80; x++) {
+        fprintf(fp, "%-15s|%-15s|%-10s|%-20s|%-15s|%-15s|\n", "textLength", "patternLength", "k-value", "elapsedTime(sec)", "virMemUsage(B)", "phyMemUsage(B)");
+        for (x=0; x<96; x++) {
             fprintf(fp, "%s", "-");
         }
     } else { // outputPerformanceFile exists
         fp = fopen(outputPerformanceFile, "a"); // start writing to outputPerformanceFile
     }
-    fprintf(fp, "\n%-15d|%-15d|%-10d|%-20.3f|%-15d|", n, m, k, timeElapsed, memoryUsed);
+    fprintf(fp, "\n%-15d|%-15d|%-10d|%-20.3f|%-15d|%-15d|", n, m, k, timeElapsed, virtualMemoryUsed, physicalMemoryUsed);
     if (fclose(fp) == EOF) { // finish writing to outputPerformanceFile
         fprintf(stderr, "Error closing performance output file\"%s\".\n", outputPerformanceFile);
         exit(1);
     }
     #endif // TEST
+
+    /* Free allocated memory. */
+    free(pattern);
+    free(text);
+    cleanupS(MAX_TRIPLET(k), &Sij);
+    cleanupL(MAX_L(k), MAX_TRIPLET(k), prevL);
+    cleanupL(MAX_L(k), MAX_TRIPLET(k), currL);
+    cleanupMaxLength(m, maxLength);
 
     return 0;
 }

@@ -2,15 +2,23 @@
  * Algorithm authors: Gad M. Landau, Uzi Vishkin and Ruth Nussinov.
  *
  * author: Alen Skvaric
- * version: 0.7.1 */
+ * version: 0.8 */
 
-//#define TEST // enable performance testing
+#ifdef __linux__
+#define LINUX
+#endif // __linux__
+
+#ifdef _WIN32
+#define WINDOWS
+#endif // _WIN32
 
 #ifdef TEST
 #include <time.h>
 #include <unistd.h>
+#ifdef WINDOWS
 #include "windows.h"
 #include "psapi.h"
+#endif // WINDOWS
 #endif // TEST
 
 #include <ctype.h>
@@ -44,13 +52,13 @@ int main(int argc, char *argv[]) {
     S_t Sij;
 
     /* Only 2 L_t structures are used in this implementation because for every iteration of diagonal d,
-     * it is sufficient to have L values for current and previous e (number of difference) */
+     * it is sufficient to have L values for current and previous e (number of difference). */
     L_t *prevL; // previous L (e of L equals previous e)
     L_t *currL; // current L (e of L equals current e)
 
     /* maxLength is m x m symmetric matrix, formed from pattern.
      * maxLength[i][j] is the longest match of prefixes between these
-     * two suffixes: pattern[i,m] and pattern[j,m] */
+     * two suffixes: pattern[i,m] and pattern[j,m]. */
     int **maxLength;
 
     int i; // current starting text index (incremented by 1 after every iteration)
@@ -73,7 +81,12 @@ int main(int argc, char *argv[]) {
     int g; // g = maxLength[c][row]
 
     int x; // auxiliary variable
-
+	
+	#if !defined(LINUX) && !defined(WINDOWS)
+	fprintf(stderr, "OS is not Linux or WIndows.\n");
+	exit(1);
+	#endif // LINUX, WINDOWS
+	
     if (argc != 4) {
         printf("Usage: lvn3 pattern_file text_file max_differences\n");
         exit(1);
@@ -172,6 +185,7 @@ int main(int argc, char *argv[]) {
     #ifndef TEST
     fp = fopen(outputResultFile, "w"); // start writing to outputResultFile
     fprintf(fp, "pattern file: %s\ntext file: %s\nk: %d\n\n", argv[1], argv[2], k);
+	fprintf(fp, "%10s%10s%10s\n", "start", "end", "diff");
     #endif // TEST
 
     /* Landau-Vishkin-Nussinov algorithm. */
@@ -239,7 +253,7 @@ int main(int argc, char *argv[]) {
                 }
                 if ((currL[D(d, k)].row==m) && (isDone==0)) { // match found
                     #ifndef TEST
-                    fprintf(fp, "%d\t%d\t%d\n", i+1, J(i, m, d), e);
+                    fprintf(fp, "%10d%10d%10d\n", i+1, J(i, m, d), e);
                     #endif // TEST
                 }
                 if (J(i, currL[D(d, k)].row, d) > maxJ) { // store diagonal that reached the biggest j
@@ -273,20 +287,30 @@ int main(int argc, char *argv[]) {
 
     #ifdef TEST
 
-    /* Get elapsed time */
+    /* Get elapsed time. */
     endClock = clock();
     timeElapsed = (double)(endClock - beginClock) / CLOCKS_PER_SEC;
     printf("\nElapsed time: %f sec\n", timeElapsed);
 
-    /* Get memory consumption (only for Windows) */
-    PROCESS_MEMORY_COUNTERS pmc;
+    /* Get memory consumption. */
+	
+    #ifdef WINDOWS
+	PROCESS_MEMORY_COUNTERS pmc;
     GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc));
     int virtualMemoryUsed = (int)pmc.PagefileUsage;
     printf("\nVirtual memory used: %d B\n", virtualMemoryUsed);
     int physicalMemoryUsed = (int)pmc.WorkingSetSize;
     printf("\nPhysical memory used: %d B\n", physicalMemoryUsed);
-
-    /* Write performance results to outputPerformanceFile */
+	#endif // WINDOWS
+	
+	#ifdef LINUX
+	int virtualMemoryUsed = getMemoryValue("VmSize");
+    printf("\nVirtual memory used: %d B\n", virtualMemoryUsed);
+    int physicalMemoryUsed = getMemoryValue("VmRSS");
+    printf("\nPhysical memory used: %d B\n", physicalMemoryUsed);
+	#endif // LINUX
+	
+    /* Write performance results to outputPerformanceFile. */
     if (access(outputPerformanceFile, F_OK) == -1) { // outputPerformanceFile does not exist
         fp = fopen(outputPerformanceFile, "w"); // start writing to outputPerformanceFile
         fprintf(fp, "%-15s|%-15s|%-10s|%-20s|%-15s|%-15s|\n", "textLength", "patternLength", "k-value", "elapsedTime(sec)", "virMemUsage(B)", "phyMemUsage(B)");

@@ -2,7 +2,7 @@
  * Algorithm authors: Gad M. Landau, Uzi Vishkin and Ruth Nussinov.
  *
  * author: Alen Skvaric
- * version: 0.7.1 */
+ * version: 0.8 */
 
 #include "functions.h"
 
@@ -17,7 +17,7 @@ int getFasta(FILE *fp, char **fasta) {
 
     int returnId = -1; // 0 - OK, -1 - error
 
-    int x; //auxiliary variable
+    int x; // auxiliary variable
 
     while (1) {
         returnId = getLine(fp, &line, &lineSize);
@@ -128,7 +128,7 @@ int initializeL(int max_L, int t_max, int t_length, L_t **arrayL) {
     L_t *tmpArrayL;
     int error = 0; // allocation error
 
-    int x, y, z; //auxiliary variables
+    int x, y, z; // auxiliary variables
 
     tmpArrayL = (L_t*) malloc(max_L * sizeof(L_t));
     if (tmpArrayL == NULL) {

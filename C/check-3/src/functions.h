@@ -2,16 +2,16 @@
  * Algorithm authors: Gad M. Landau, Uzi Vishkin and Ruth Nussinov.
  *
  * author: Alen Skvaric
- * version: 0.7.1 */
+ * version: 0.8 */
+
+#ifndef FUNCTIONS_H_INCLUDED
+#define FUNCTIONS_H_INCLUDED
 
 #include <malloc.h>
 #include <stdio.h>
 #include <ctype.h>
 
 #include "structs.h"
-
-#ifndef FUNCTIONS_H_INCLUDED
-#define FUNCTIONS_H_INCLUDED
 
 /* Read all lines from FILE pointer fp (FASTA file) and store it in string fasta
  * which is passed by reference. If memory cannot be allocated, print error message

@@ -7,8 +7,21 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class containing methods used for parsing FASTA files.
+ * 
+ * @author Dino Pacandi
+ * 
+ */
 public class FASTAParser {
 
+	/**
+	 * Method is used to read all sequences stored in the given filename
+	 * 
+	 * @param fileName
+	 *            Name (path) of the file containing sequences.
+	 * @return List of FASTA sequences.
+	 */
 	public static List<FASTASequence> parseFASTAFile(String fileName) {
 		List<FASTASequence> sequences = new ArrayList<>();
 

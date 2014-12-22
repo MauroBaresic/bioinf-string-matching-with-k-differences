@@ -19,7 +19,7 @@ public class Tests {
 
 		sb.append(String.format("%-12s\t%-12s\t%-12s\t%-12s\t%-12s\n", "textLength", "patternLength",
 				"k-value", "elapsedTime", "memUsage"));
-		String format = "%-12d\t%-12d\t%-12d\t%-12d\t%-12d";
+		String format = "%-12d\t%-12d\t%-12d\t%-12f\t%-12f";
 
 		for (String filePath : textFilePaths) {
 			FASTASequence text = FASTAParser.parseFASTAFile(filePath).get(0);
@@ -45,12 +45,12 @@ public class Tests {
 
 			sb.append(
 					String.format(format, text.getSequenceLength(), pattern.getSequenceLength(), k,
-							elapsedTime, peekMemory)).append("\n");
+							elapsedTime * 1.0 / 1000, peekMemory * 1.0 / 1024 / 1024)).append("\n");
 		}
 
 		try {
 			FileWriter writer = new FileWriter(outputFilePath);
-			writer.write(sb.toString());
+			writer.write(sb.toString().replaceAll(",", "."));
 			writer.flush();
 			writer.close();
 		} catch (IOException e) {

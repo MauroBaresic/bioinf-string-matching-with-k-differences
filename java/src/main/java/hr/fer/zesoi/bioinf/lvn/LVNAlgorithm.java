@@ -100,7 +100,7 @@ public class LVNAlgorithm {
 
 		for (int i = 0; i <= limit; i++) {
 			updatePeekMemoryUsage();
-//			System.out.println("Processing index " + i);
+			// System.out.println("Processing index " + i);
 			// [1]
 			L.init();
 			oldT = new TList(k);
@@ -178,9 +178,9 @@ public class LVNAlgorithm {
 					updatePeekMemoryUsage();
 					// [6]
 					if (L.get(d, e) == pattern.length) {
-						System.out.println("Found match:\n\tstarting index: " + i
-								+ "\n\tnumber of differences: " + e);
-//						L.print();
+						;
+						System.out.println(String.format("%10d%10d%10d", i, (i + row + d), e));
+						// L.print();
 						breakOut = true;
 						break;
 						// GOTO 7
@@ -209,7 +209,7 @@ public class LVNAlgorithm {
 	public long getPeekMemoryUsage() {
 		return peekMemoryUsage;
 	};
-	
+
 	/**
 	 * Sets the peek memory usage to 0.
 	 */
@@ -253,7 +253,7 @@ public class LVNAlgorithm {
 	 * Element stored at the specified location is the row that was reached
 	 * whilst taking into account the given constraints.
 	 * 
-	 * @author Gossamer
+	 * @author Dino Pacandi
 	 * 
 	 */
 	public static class LTable {
@@ -326,6 +326,9 @@ public class LVNAlgorithm {
 			}
 		}
 
+		/**
+		 * Used for debugging.
+		 */
 		public void print() {
 			for (int d = -(k + 1); d <= (k + 1); d++) {
 				for (int e = 0; e <= k; e++) {
@@ -340,7 +343,7 @@ public class LVNAlgorithm {
 	/**
 	 * Class TList is used to store triplet lists.
 	 * 
-	 * @author Gossamer
+	 * @author Dino Pacandi
 	 * 
 	 */
 	public static class TList {

@@ -2,7 +2,7 @@
  * Algorithm authors: Gad M. Landau, Uzi Vishkin and Ruth Nussinov.
  *
  * author: Alen Skvaric
- * version: 0.8 */
+ * version: 0.8.1 */
 
 #include "test.h"
 
@@ -15,15 +15,15 @@ int parseLine(char* line) {
 	return atoi(line);
 }
 
-int getMemoryValue(char *memType) {
+double getMemoryValue(char *memType) {
 
 	FILE* file = fopen("/proc/self/status", "r");
-	int result = -1;
+	double result = -1;
 	char line[100];
 
 	while (fgets(line, 100, file) != NULL) {
 		if (strncmp(line, memType, strlen(memType)) == 0) {
-			result = parseLine(line)*1024;
+			result = (double)parseLine(line)/1024;
 			break;
 		}
 	}

@@ -2,7 +2,7 @@
  * Algorithm authors: Gad M. Landau, Uzi Vishkin and Ruth Nussinov.
  *
  * author: Alen Skvaric
- * version: 0.8 */
+ * version: 0.8.1 */
 
 #ifndef TEST_H_INCLUDED
 #define TEST_H_INCLUDED
@@ -17,8 +17,8 @@
 int parseLine(char* line);
 
 /* Open "/proc/self/status" and find memory value of specified memory type.
- * If no value is found, return -1.
- * NOTE: Return value is in bytes. */
-int getMemoryValue(char* memType);
+ * If no value is found, return negative value.
+ * NOTE: Return value is in megabytes. */
+double getMemoryValue(char* memType);
 
 #endif // TEST_H_INCLUDED

@@ -2,7 +2,7 @@
  * Algorithm authors: Gad M. Landau, Uzi Vishkin and Ruth Nussinov.
  *
  * author: Alen Skvaric
- * version: 0.8 */
+ * version: 0.8.1 */
 
 #ifdef __linux__
 #define LINUX
@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
     int maxD; // diagonal on which maxJ was first reached
     int e; // current number of difference between pattern and part of text (e=[0,k])
     int d; // current diagonal (|d|<=e)
-    int isDone; // boolean value, check if current diagonal has already better match (is already done)
+    int isDone = 0; // boolean value, check if current iteration i has already better match (is already done)
     int noNewSymbol; // boolean value, check if no new rightmost text symbol is reached
     int l1; // row of L(d,e) after initialization
     int row; // row of L(d,e)
@@ -185,24 +185,21 @@ int main(int argc, char *argv[]) {
     #ifndef TEST
     fp = fopen(outputResultFile, "w"); // start writing to outputResultFile
     fprintf(fp, "pattern file: %s\ntext file: %s\nk: %d\n\n", argv[1], argv[2], k);
-	fprintf(fp, "%10s%10s%10s\n", "start", "end", "diff");
+	fprintf(fp, "%12s%10s%22s\n", "startIndex", "endIndex", "numberOfDifferences");
     #endif // TEST
 
     /* Landau-Vishkin-Nussinov algorithm. */
     for (i=0; i<=n-m+k; i++) { // for i>n-m+k, match is impossible
+		isDone = 0; // 1 - print result for current i, 0 - do not print
         for (e=0; e<=k; e++) { // limits: e=[0,k]
-
+			
             /* Initialize previous L (where necessary). */
             prevL[D(e+1, k)].row = prevL[D(-e-1, k)].row = NEG_INFINITY;
             prevL[D(-e, k)].row = e - 1;
             prevL[D(e, k)].row = -1;
 
             for (d=-e; d<=e; d++) { // limits: |d|<=e
-                isDone = 0; // 0 - print result for d, 1 - do not print
                 noNewSymbol = 0; // 0 - no new rightmost symbol reached, 1 - new symbol reached
-                if (prevL[D(d, k)].row == m) { // current d already has better match
-                    isDone = 1;
-                }
                 choice = getMax(prevL[D(d-1, k)].row, prevL[D(d, k)].row+1, prevL[D(d+1, k)].row+1, &l1);
                 if (l1 > m) { // limits: l1<=m
                     l1 = m;
@@ -251,17 +248,18 @@ int main(int argc, char *argv[]) {
                 if (currL[D(d, k)].row > l1) {
                     addTripletToL(J(i, l1, d), l1, currL[D(d, k)].row-l1, &currL[D(d, k)]);
                 }
-                if ((currL[D(d, k)].row==m) && (isDone==0)) { // match found
+                if ((currL[D(d, k)].row==m && isDone==0)) { // match found
                     #ifndef TEST
-                    fprintf(fp, "%10d%10d%10d\n", i+1, J(i, m, d), e);
+                    fprintf(fp, "%12d%10d%22d\n", i, J(i, m, d)-1, e);
                     #endif // TEST
+					isDone = 1;
                 }
                 if (J(i, currL[D(d, k)].row, d) > maxJ) { // store diagonal that reached the biggest j
                     maxJ = J(i, currL[D(d, k)].row, d);
                     maxD = D(d, k);
                 }
             }
-            if (e != k) { // switch current and previous L if e did not reach k, if e=k switch is pointless
+            if (e != k) { // switch current and previous L until e reaches k, if e=k switch is pointless
                 switchL(&prevL, &currL);
             }
         }
@@ -290,37 +288,30 @@ int main(int argc, char *argv[]) {
     /* Get elapsed time. */
     endClock = clock();
     timeElapsed = (double)(endClock - beginClock) / CLOCKS_PER_SEC;
-    printf("\nElapsed time: %f sec\n", timeElapsed);
+    printf("\nElapsed time: %f s\n", timeElapsed);
 
     /* Get memory consumption. */
 	
     #ifdef WINDOWS
 	PROCESS_MEMORY_COUNTERS pmc;
     GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc));
-    int virtualMemoryUsed = (int)pmc.PagefileUsage;
-    printf("\nVirtual memory used: %d B\n", virtualMemoryUsed);
-    int physicalMemoryUsed = (int)pmc.WorkingSetSize;
-    printf("\nPhysical memory used: %d B\n", physicalMemoryUsed);
+    double memoryUsed = (double)pmc.PeakWorkingSetSize/(1024*1024);
+    printf("\nMemory used: %f MB\n", memoryUsed);
 	#endif // WINDOWS
 	
 	#ifdef LINUX
-	int virtualMemoryUsed = getMemoryValue("VmSize");
-    printf("\nVirtual memory used: %d B\n", virtualMemoryUsed);
-    int physicalMemoryUsed = getMemoryValue("VmRSS");
-    printf("\nPhysical memory used: %d B\n", physicalMemoryUsed);
+    double memoryUsed = getMemoryValue("VmHWM");
+    printf("\nMemory used: %f MB\n", memoryUsed);
 	#endif // LINUX
 	
     /* Write performance results to outputPerformanceFile. */
     if (access(outputPerformanceFile, F_OK) == -1) { // outputPerformanceFile does not exist
         fp = fopen(outputPerformanceFile, "w"); // start writing to outputPerformanceFile
-        fprintf(fp, "%-15s|%-15s|%-10s|%-20s|%-15s|%-15s|\n", "textLength", "patternLength", "k-value", "elapsedTime(sec)", "virMemUsage(B)", "phyMemUsage(B)");
-        for (x=0; x<96; x++) {
-            fprintf(fp, "%s", "-");
-        }
+        fprintf(fp, "%-15s%-15s%-10s%-20s%-15s", "textLength", "patternLength", "k-value", "elapsedTime(sec)", "memUsage(MB)");
     } else { // outputPerformanceFile exists
         fp = fopen(outputPerformanceFile, "a"); // start writing to outputPerformanceFile
     }
-    fprintf(fp, "\n%-15d|%-15d|%-10d|%-20.3f|%-15d|%-15d|", n, m, k, timeElapsed, virtualMemoryUsed, physicalMemoryUsed);
+    fprintf(fp, "\n%-15d%-15d%-10d%-20.3f%-15.3f", n, m, k, timeElapsed, memoryUsed);
     if (fclose(fp) == EOF) { // finish writing to outputPerformanceFile
         fprintf(stderr, "Error closing performance output file\"%s\".\n", outputPerformanceFile);
         exit(1);

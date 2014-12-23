@@ -2,7 +2,7 @@
  * Algorithm authors: Gad M. Landau, Uzi Vishkin and Ruth Nussinov.
  *
  * author: Alen Skvaric
- * version: 0.8 */
+ * version: 0.8.1 */
 
 #ifndef STRUCTS_H_INCLUDED
 #define STRUCTS_H_INCLUDED

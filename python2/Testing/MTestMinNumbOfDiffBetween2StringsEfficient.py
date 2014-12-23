@@ -235,39 +235,42 @@ def printStatisticsToFile(path, stats):
 
 if __name__ == "__main__":
 
-    #path = sys.argv[1]
-    pathK = "./KTest/kVals.txt"
+    pathK = "./MTest/kVal.txt"
     f = open(pathK)
     kListString = f.readline().split()
     f.close()
     
     kList = [int(x) for x in kListString]
-    #print kList
-    
-    patternPath = "./KTest/pattern.fa"
+    k = kList[0]
+    #path = sys.argv[1]
+    #patternPath = "./Texts/pattern.fa"
 
     """if (len(rows) != 2):
         print "Use!"
         sys.exit()"""
 
-    R = parseFastaFile(patternPath)
-    
-    textPath = "./KTest/text.fa"
+    #R = parseFastaFile(patternPath)
+    textPath = "./MTest/text.fa"
     B = parseFastaFile(textPath)
-
     
-    f = open("KTest-python2.7.txt","w")
+    patterns = os.listdir("./MTest")
+    patterns.remove("text.fa")
+    patterns.remove("kVal.txt")
+    
+    f = open("MTest-python2.7.txt","w")
     f.write("textLength\tpatternLength\tk-value\telapsedTime(sec)\n")#\tusedMemory(MB)\n")
     f.close()
-    for k in kList:
+    
+    for i in xrange(len(patterns)):
         timeStart = time.time()
+        R = parseFastaFile("./MTest/" + patterns[i])
 
         mdi = MinDifferenceEfficient(R,B)
         x1 = mdi.MAXLENGTH
         mdi.calculate(k)
         elapsed_time = str(round(time.time() - timeStart,3))
         #used_memory = memory_usage_psutil()
-        printStatisticsToFile("KTest-python2.7.txt", [str(len(B)), str(len(R)), str(k), elapsed_time])#, used_memory])
+        printStatisticsToFile("MTest-python2.7.txt", [str(len(B)), str(len(R)), str(k), elapsed_time])#, used_memory])
     
     """mdi.computeMAXLENGTH()
     x2 = mdi.MAXLENGTH

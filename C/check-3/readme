@@ -9,8 +9,8 @@ check-3|
        |   |       |     |compile.sh
        |   |       |     |pat1text1.sh
        |   |       |windows|
-       |   |               |compile.sh
-       |   |               |pat1text1.sh
+       |   |               |compile.bat
+       |   |               |pat1text1.bat
        |   |function.c
        |   |function.h
        |   |lvn3.c

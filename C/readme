@@ -1,0 +1,54 @@
+###########################################################
+###   C DIRECTORY STRUCTURE                             ###
+###########################################################
+
+C|
+ |check-1|...
+ |check-2|...
+ |check-3|...
+ |data|Test data|KTest|
+ |    |         |     |kVals.txt
+ |    |         |     |pattern.fa
+ |    |         |     |text.fa
+ |    |         |MTest|
+ |    |               |kVal.txt
+ |    |               |pattern<0-9>.fa
+ |    |               |text.fa
+ |    |Texts|
+ |    |     |pattern.fa
+ |    |     |text1e<3-6>.fa
+ |    |     |text2e6.fa
+ |    |     |text5e<1,3-5>.fa
+ |    |     |text25e1.fa
+ |examples|
+ |        |pattern1.txt
+ |        |text1.txt
+ |readme
+
+###########################################################
+###   ABOUT                                             ###
+###########################################################
+
+In directories check-1, check-2 and check-3 are three different
+implementations of a string matching algorithm with k differences.
+
+Check-1 is dynamic programming realisation with memory complexity
+of O(m*n) and time complexity of O(m^2*n) (m - pattern length,
+n - text length, k - maximum differences allowed).
+
+Check-2 is modified dynamic programming realisation with memory
+complexity of O(k*m) and time complexity of O(k*m*n).
+
+Check-3 is implementation of Landau-Vishkin-Nussinov algorithm
+with memory complexity of O(m^2) and time complexity of O(k^2*m).
+
+In data directory are all pattern and text files used for
+performance testing for every check algorithm. In examples
+directory are some smaller examples not meant for performance
+testing.
+
+IMPORTANT: Every check assumes directory structure shown in this
+document. Moving or renaming files could result in programs not 
+working correctly.
+
+NOTE: Check-1 and check-2 are currently not implemented properly.

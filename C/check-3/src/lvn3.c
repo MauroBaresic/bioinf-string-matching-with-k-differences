@@ -2,7 +2,7 @@
  * Algorithm authors: Gad M. Landau, Uzi Vishkin and Ruth Nussinov.
  *
  * author: Alen Skvaric
- * version: 0.8.1 */
+ * version: 0.9 */
 
 #ifdef __linux__
 #define LINUX
@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
     FILE *fp;
 
     #ifdef TEST
-    char *outputPerformanceFile = "performanceOutput";
+    char *outputPerformanceFile;
     #endif // TEST
 
     #ifndef TEST
@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
      * maxLength[i][j] is the longest match of prefixes between these
      * two suffixes: pattern[i,m] and pattern[j,m]. */
     int **maxLength;
-
+    
     int i; // current starting text index (incremented by 1 after every iteration)
     int j = 0; // index of the rightmost text symbol that was checked in previous iterations of i
     int maxJ = 0; // index of the rightmost text symbol for current iteration i
@@ -81,18 +81,27 @@ int main(int argc, char *argv[]) {
     int g; // g = maxLength[c][row]
 
     int x; // auxiliary variable
-	
-	#if !defined(LINUX) && !defined(WINDOWS)
-	fprintf(stderr, "OS is not Linux or WIndows.\n");
-	exit(1);
-	#endif // LINUX, WINDOWS
-	
+    
+    #if !defined(LINUX) && !defined(WINDOWS)
+    fprintf(stderr, "OS is not Linux or Windows.\n");
+    exit(1);
+    #endif // LINUX, WINDOWS
+    
+    #ifndef TEST
     if (argc != 4) {
         printf("Usage: lvn3 pattern_file text_file max_differences\n");
         exit(1);
     }
-
+    #endif //TEST
+    
     #ifdef TEST
+    if (argc != 5) {
+        printf("Usage: lvn3 pattern_file text_file max_differences test_output\n");
+        exit(1);
+    }
+    
+    outputPerformanceFile = argv[4];
+    
     clock_t beginClock, endClock;
     double timeElapsed;
 
@@ -158,7 +167,7 @@ int main(int argc, char *argv[]) {
     }
     k = atoi(argv[3]);
     if (k >= m) {
-        fprintf(stderr, "Maximal number of differences must be less than pattern length.\n");
+        fprintf(stderr, "Maximal number of differences must be lesser than pattern length.\n");
         exit(1);
     }
 
@@ -185,14 +194,14 @@ int main(int argc, char *argv[]) {
     #ifndef TEST
     fp = fopen(outputResultFile, "w"); // start writing to outputResultFile
     fprintf(fp, "pattern file: %s\ntext file: %s\nk: %d\n\n", argv[1], argv[2], k);
-	fprintf(fp, "%12s%10s%22s\n", "startIndex", "endIndex", "numberOfDifferences");
+    fprintf(fp, "%12s%10s%22s\n", "startIndex", "endIndex", "numberOfDifferences");
     #endif // TEST
 
     /* Landau-Vishkin-Nussinov algorithm. */
     for (i=0; i<=n-m+k; i++) { // for i>n-m+k, match is impossible
-		isDone = 0; // 1 - print result for current i, 0 - do not print
+        isDone = 0; // 1 - print result for current i, 0 - do not print
         for (e=0; e<=k; e++) { // limits: e=[0,k]
-			
+            
             /* Initialize previous L (where necessary). */
             prevL[D(e+1, k)].row = prevL[D(-e-1, k)].row = NEG_INFINITY;
             prevL[D(-e, k)].row = e - 1;
@@ -248,11 +257,11 @@ int main(int argc, char *argv[]) {
                 if (currL[D(d, k)].row > l1) {
                     addTripletToL(J(i, l1, d), l1, currL[D(d, k)].row-l1, &currL[D(d, k)]);
                 }
-                if ((currL[D(d, k)].row==m && isDone==0)) { // match found
+                if ((currL[D(d, k)].row==m) && (isDone==0)) { // match found
                     #ifndef TEST
                     fprintf(fp, "%12d%10d%22d\n", i, J(i, m, d)-1, e);
                     #endif // TEST
-					isDone = 1;
+                    isDone = 1;
                 }
                 if (J(i, currL[D(d, k)].row, d) > maxJ) { // store diagonal that reached the biggest j
                     maxJ = J(i, currL[D(d, k)].row, d);
@@ -291,19 +300,19 @@ int main(int argc, char *argv[]) {
     printf("\nElapsed time: %f s\n", timeElapsed);
 
     /* Get memory consumption. */
-	
+    
     #ifdef WINDOWS
-	PROCESS_MEMORY_COUNTERS pmc;
+    PROCESS_MEMORY_COUNTERS pmc;
     GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc));
     double memoryUsed = (double)pmc.PeakWorkingSetSize/(1024*1024);
     printf("\nMemory used: %f MB\n", memoryUsed);
-	#endif // WINDOWS
-	
-	#ifdef LINUX
+    #endif // WINDOWS
+    
+    #ifdef LINUX
     double memoryUsed = getMemoryValue("VmHWM");
     printf("\nMemory used: %f MB\n", memoryUsed);
-	#endif // LINUX
-	
+    #endif // LINUX
+    
     /* Write performance results to outputPerformanceFile. */
     if (access(outputPerformanceFile, F_OK) == -1) { // outputPerformanceFile does not exist
         fp = fopen(outputPerformanceFile, "w"); // start writing to outputPerformanceFile

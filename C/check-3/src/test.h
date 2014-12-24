@@ -2,7 +2,7 @@
  * Algorithm authors: Gad M. Landau, Uzi Vishkin and Ruth Nussinov.
  *
  * author: Alen Skvaric
- * version: 0.8.1 */
+ * version: 0.9 */
 
 #ifndef TEST_H_INCLUDED
 #define TEST_H_INCLUDED

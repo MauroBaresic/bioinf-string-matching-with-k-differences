@@ -1,5 +1,5 @@
-@ECHO OFF
+@echo off
 
-set src_path="../.."
+set src_path=../..
 
-START /WAIT gcc -o lvn3 %src_path%/functions.c %src_path%/lvn3.c
+start /wait gcc -o lvn3 "%src_path%/functions.c" "%src_path%/lvn3.c"

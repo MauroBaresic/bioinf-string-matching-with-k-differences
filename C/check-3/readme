@@ -1,0 +1,76 @@
+###########################################################
+###   CHECK-3 DIRECTORY STRUCTURE                       ###
+###########################################################
+
+check-3|
+       |src|
+       |   |example|
+       |   |       |linux|
+       |   |       |     |compile.sh
+       |   |       |     |pat1text1.sh
+       |   |       |windows|
+       |   |               |compile.sh
+       |   |               |pat1text1.sh
+       |   |function.c
+       |   |function.h
+       |   |lvn3.c
+       |   |macros.h
+       |   |structs.h
+       |   |test.c
+       |   |test.h
+       |test|
+       |    |linux|
+       |    |     |compile.sh
+       |    |     |ktest.sh
+       |    |     |mtest.sh
+       |    |     |ntest.sh
+       |    |windows|
+       |            |compile.bat
+       |            |ktest.bat
+       |            |mtest.bat
+       |            |ntest.bat
+       |readme
+
+###########################################################
+###   COMPILE AND RUN EXAMPLE(LINUX)                    ###
+###########################################################
+
+Open terminal and go to directory check-3/src/example/linux.
+Run compile.sh to build. After that, run pat1text1.sh.
+Results are stored in resultOutput.
+
+###########################################################
+###   COMPILE AND RUN EXAMPLE(WINDOWS)                  ###
+###########################################################
+
+Go to directory check-3/src/example/windows.
+Run compile.bat to build. After that, run pat1text1.bat.
+Results are stored in resultOutput.
+
+###########################################################
+###   COMPILE AND RUN TESTS(LINUX)                      ###
+###########################################################
+
+Open terminal and go to directory check-3/src/test/linux.
+Run compile.sh to build. After that, run one of the following:
+  ktest.sh - for testing with constant k value
+  mtest.sh - for testing with constant m value
+  ntest.sh - for testing with constant n value
+Results are stored in the following files:
+  performanceOutputK - when testing with constant k value
+  performanceOutputM - when testing with constant m value
+  performanceOutputN - when testing with constant n value
+
+###########################################################
+###   COMPILE AND RUN TESTS(WINDOWS)                    ###
+###########################################################
+
+Go to directory check-3/src/test/windows.
+Run compile.bat to build. After that, run one of the following:
+  ktest.bat - for testing with constant k value
+  mtest.bat - for testing with constant m value
+  ntest.bat - for testing with constant n value
+Results are stored in the following files:
+  performanceOutputK - when testing with constant k value
+  performanceOutputM - when testing with constant m value
+  performanceOutputN - when testing with constant n value

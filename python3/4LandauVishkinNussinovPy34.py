@@ -1,14 +1,28 @@
-read=open('data.txt','r')
-write=open('result.txt','w')
+read = open('data.txt','r')
+write = open('result.txt','w')
 
-r='X'+read.readline()
-b='x'+read.readline()
-n=len(b)-1
-m=len(r)-2
-k=3
+R = read.readline().rstrip()
+B = read.readline().rstrip()
+n = len(B)
+m = len(R)
+k = 3
 
-MAXLENGHT[0][0]=0
-for d in range 
+print(R)
+print(B)
+print(m, n)
+
+MAXLENGTH = [[0 for i in range(m)] for j in range(m)]
+for i in range(m):
+    for j in range(i, m):
+        length = 0
+        for p in range(m-j):
+            if (R[i+p] != R[j+p]):
+                break
+            length = length+1
+        MAXLENGTH[i][j] = length
+        MAXLENGTH[j][i] = length
+        
+print(MAXLENGTH)
    
 
 j=0

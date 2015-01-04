@@ -7,10 +7,6 @@ n = len(B)
 m = len(R)
 k = 3
 
-print(R)
-print(B)
-print(m, n)
-
 MAXLENGTH = [[0 for i in range(m)] for j in range(m)]
 for i in range(m):
     for j in range(i, m):
@@ -21,62 +17,99 @@ for i in range(m):
             length = length+1
         MAXLENGTH[i][j] = length
         MAXLENGTH[j][i] = length
-        
 
+S_ij = None
+newS_ij = None
 j = 0
+max_j = 0
 choice = 0
 for i in range(n-m+k+1):
     L = dict()
     T = dict()
+    best_match = 0
     
-    L[(d, abs(d)-2)] = -999
-    if (d < 0):
-        L[d, abs(d)-1] = abs(d)-1
-    else:
-        L[d, abs(d)-1] = -1
+    for d in range(-(k+1), (k+1)+1):
+        L[(d, abs(d)-2)] = -999
+        T[(d, abs(d)-2)] = list()
+        if (d < 0):
+            L[(d, abs(d)-1)] = abs(d)-1
+            T[(d, abs(d)-1)] = list()
+        else:
+            L[(d, abs(d)-1)] = -1
+            T[(d, abs(d)-1)] = list()
         
     for e in range(k+1):
         for d in range(-e, e+1):
             row = max(L[(d, e-1)]+1, L[(d-1, e-1)], L[(d+1, e-1)]+1)
-            
-            print(row)
-            
+            old_row = row
+
             if (row == L[(d-1, e-1)]):
-                    choice = 0
-                    T[(d, e)] = T[(d-1, e-1)]
-                    T[(d, e)].append((i+row+d-1,0,0))
-                elif (row == L[(d, e-1)]+1):
-                    choice = 1
-                    T[(d, e)] = T[(d, e-1)]
-                    T[(d, e)].append((i+row+d-1,0,0))
-                elif (row == L[(d+1, e-1)]+1):
-                    choice = 2
-                    T[(d, e)] = T[(d+1, e-1)]
+                choice = 0
+                T[(d, e)] = T[(d-1, e-1)]
+                T[(d, e)].append((i+row+d-1,0,0))
+            elif (row == L[(d, e-1)]+1):
+                choice = 1
+                T[(d, e)] = T[(d, e-1)]
+                T[(d, e)].append((i+row+d-1,0,0))
+            elif (row == L[(d+1, e-1)]+1):
+                choice = 2
+                T[(d, e)] = T[(d+1, e-1)]
                 
-            print(T(d, e)]
-                
-            done=0
+            done = 0
             while ((i+row+d+1) <= j) and (row < m) and ((i+row+d) < n):
-                ##c i f
-                if f>=1:
-                    if f!=MAXLENGHT[c][row]:
-                        row=row+min(f,MAXLENGHT(c,row))
-                        done=1
+                c=0
+                f=0
+                if (S_ij is not None):
+                    j=i+row+d
+                    for x in range(len(S_ij)):
+                        triple = S_ij[x]
+                        if (j == triple[0]) and (triple[2] == 0):
+                            c = f = 0
+                            break
+                        else:
+                            if (j <= triple[0]+triple[2]) and (j > triple[0]):
+                                difference = j-triple[0]
+                                c = triple[1]+difference
+                                f = triple[2]-difference
+                                break
+                            
+                if (f >= 1):
+                    if (f != MAXLENGTH[c][row]):
+                        row = row+min(f, MAXLENGTH[c][row])
+                        done = 1
+                        break
                     else:
-                        row=row+f
+                        row = row+f
                 else:
-                    if b[i+row+d+1]!=r[row+1]:
-                        done=1
+                    try:
+                        if B[i+row+d] != R[row]:
+                            done = 1
+                            break
+                    except IndexError:
+                        print(row, i+row+d, j)
                     else:
-                        row=row+1
-            while r[row+1]==b[i+row+1+d] and done==0 and row<m:
-                row=row+1
-            L[d,e]=row
-            if L[d,e]==m:
-                print('YES')
-                break ##exits from last for loop
-    ##novi simboli
+                        row = row+1
 
+            if (done == 0):
+                while (row < m) and (i+row+d < n) and (R[row] == B[i+row+d]):
+                    row = row+1
+                    
+            L[(d,e)] = row
+            
+            if (old_row < row):
+                T[(d,e)].append((i+old_row+d, old_row, row-old_row))
+            if (i+row+d > max_j):
+                max_j = i+row+d
+                newS_ij = (d,e)
+            if (row == m) and (best_match == 0):
+                ##nest upisat u result
+                print('start =', i, 'end =', i+m+d-1, 'diff =', e)
+                best_match = 1
+        
+    if (max_j > j):
+        j= max_j
+        S_ij = T[newS_ij]
 
+        
 read.close()
 write.close()

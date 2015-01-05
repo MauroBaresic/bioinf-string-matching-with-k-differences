@@ -1,8 +1,15 @@
-read = open('data.txt','r')
-write = open('result.txt','w')
+import resource
+import time
 
-R = read.readline().rstrip()
-B = read.readline().rstrip()
+start = time.clock()
+
+read_pattern = open('patternfasta.fa','r')
+read_text = open('textfasta.fa','r')
+result = open('result.txt','w')
+result.write('pattern\ttext\tk\ttime\tmemory\n')
+
+R = read_pattern.readline().rstrip()
+B = read_text.readline().rstrip()
 n = len(B)
 m = len(R)
 k = 3
@@ -110,6 +117,11 @@ for i in range(n-m+k+1):
         j= max_j
         S_ij = T[newS_ij]
 
-        
-read.close()
-write.close()
+end = time.clock()
+s = str(m)+'\t'+'\t'+str(n)+'\t'+'\t'+str(k)+'\t'+str(round(end - start))+'\t'+\
+    '\t'+str(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss/1000)+'\n'
+result.write(s)
+
+read_pattern.close()
+read_text.close()
+result.close()

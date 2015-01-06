@@ -8,10 +8,27 @@ read_text = open('textfasta.fa','r')
 result = open('result.txt','w')
 result.write('pattern\ttext\tk\ttime\tmemory\n')
 
-R = read_pattern.readline().rstrip()
-B = read_text.readline().rstrip()
-n = len(B)
+R = ''
+B = ''
+
+read = 0
+for line in read_pattern.readlines():
+    if (line[0] == '>') and (read == 0):
+        read = 1
+    elif (line[0] != '>') and (read == 1):
+        R = R+line.rstrip()
+read_pattern.close()
 m = len(R)
+
+read = 0
+for line in read_text.readlines():
+    if (line[0] == '>') and (read == 0):
+        read = 1
+    elif (line[0] != '>') and (read == 1):
+        B = B+line.rstrip()
+read_text.close()
+n = len(B)
+
 k = 3
 
 MAXLENGTH = [[0 for i in range(m)] for j in range(m)]
@@ -109,7 +126,6 @@ for i in range(n-m+k+1):
                 max_j = i+row+d
                 newS_ij = (d,e)
             if (row == m) and (best_match == 0):
-                ##nest upisat u result
                 print('start =', i, 'end =', i+m+d-1, 'diff =', e)
                 best_match = 1
         
@@ -122,6 +138,4 @@ s = str(m)+'\t'+'\t'+str(n)+'\t'+'\t'+str(k)+'\t'+str(round(end - start))+'\t'+\
     '\t'+str(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss/1000)+'\n'
 result.write(s)
 
-read_pattern.close()
-read_text.close()
 result.close()

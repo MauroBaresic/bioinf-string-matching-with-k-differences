@@ -1,3 +1,2 @@
-pattern	text	k	time	memory
-
-5	10	3	0	5.9
+text      pattern   k         time      memory    
+10        5         3         0         5.9       

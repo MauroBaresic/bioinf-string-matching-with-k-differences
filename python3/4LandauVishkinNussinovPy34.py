@@ -1,12 +1,19 @@
 import resource
 import time
 
+
+print('type in requested data and press enter after each input')
+text_path = input('textFilePath: ')
+read_text = open(text_path,'r')
+pattern_path = input('patternFilePath: ')
+read_pattern = open(pattern_path,'r')
+k = int(input('k: '))
+
 start = time.clock()
 
-read_pattern = open('patternfasta.fa','r')
-read_text = open('textfasta.fa','r')
 result = open('result.txt','w')
-result.write('pattern\ttext\tk\ttime\tmemory\n')
+s = '{0: <10}{1: <10}{2: <10}{3: <10}{4: <10}\n'.format('text', 'pattern', 'k', 'time', 'memory')
+result.write(s)
 
 R = ''
 B = ''
@@ -28,8 +35,6 @@ for line in read_text.readlines():
         B = B+line.rstrip()
 read_text.close()
 n = len(B)
-
-k = 3
 
 MAXLENGTH = [[0 for i in range(m)] for j in range(m)]
 for i in range(m):
@@ -134,8 +139,9 @@ for i in range(n-m+k+1):
         S_ij = T[newS_ij]
 
 end = time.clock()
-s = str(m)+'\t'+'\t'+str(n)+'\t'+'\t'+str(k)+'\t'+str(round(end - start))+'\t'+\
-    '\t'+str(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss/1000)+'\n'
-result.write(s)
 
+s = '{0: <10}{1: <10}{2: <10}{3: <10}{4: <10}\n'.format(str(n), str(m), str(k), \
+    str(round(end - start)), str(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss/1000))
+
+result.write(s)
 result.close()

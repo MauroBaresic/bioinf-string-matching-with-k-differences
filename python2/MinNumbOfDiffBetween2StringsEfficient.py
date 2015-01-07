@@ -2,8 +2,6 @@
 # email: mauro.baresic@outlook.com
 
 import sys
-import os
-import time
 
 # procedure for parsing file in FASTA format
 def parseFastaFile(path):
@@ -193,8 +191,7 @@ class MinDifferenceEfficient():
                         self.newSij = (d,e)
                     #6
                     if (row == self.m):
-                        print "An occurence with <=",self.k,"differences of the pattern starts in text at",i,", ends at",max_j
-                        print self.R, self.B[i:max_j+1]
+                        print "An occurence with <=",self.k,"differences of the pattern starts at",i
                         #GOTO 7
                         next_i = True
                         break
@@ -252,41 +249,14 @@ class MinDifferenceEfficient():
                     #self.MAXLENGTH[(i,i+d)] = 0
                     #self.MAXLENGTH[(i+d,i)] = 0
                     
-# procedure that prints usage statistics to file
-def printStatisticsToFile(path, stats):
-    f = open(path,'a')
-    line = ""
-    for x in stats:
-        line += x + "\t"
-    
-    f.write(line.rstrip() + "\n")
-
-    f.close()
-
 if __name__ == "__main__":
     
-    #patternPath = sys.argv[1]
-    #textPath = sys.argv[2]
-    #k = int(sys.argv[3])
+    patternPath = sys.argv[1]
+    textPath = sys.argv[2]
+    k = int(sys.argv[3])
     
-    k = 4
-    patternPath = "./Texts/pattern.fa"
-
     R = parseFastaFile(patternPath)
-    
-    texts = os.listdir("./Texts")
-    texts.remove("pattern.fa")
-    #texts = ["text5e1.fa", "text25e1.fa"]
-    f = open("output-python2.7.txt","w")
-    f.write("textLength\tpatternLength\tk-value\telapsedTime(sec)\n")
-    f.close()
-    for i in xrange(len(texts)):
-        timeStart = time.time()
-        B = parseFastaFile("./Texts/" + texts[i])
+    B = parseFastaFile(textPath)
 
-        mdi = MinDifferenceEfficient(R,B)
-        x1 = mdi.MAXLENGTH
-        mdi.calculate(k)
-        elapsed_time = str(round(time.time() - timeStart,3))
-        #used_memory = memory_usage_psutil()
-        printStatisticsToFile("output-python2.7.txt", [str(len(B)), str(len(R)), str(k), elapsed_time])#, used_memory])
+    mde = MinDifferenceEfficient(R,B)
+    mde.calculate(k)

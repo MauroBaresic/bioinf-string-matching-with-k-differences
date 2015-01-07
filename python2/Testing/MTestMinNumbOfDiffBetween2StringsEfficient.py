@@ -257,7 +257,7 @@ if __name__ == "__main__":
     patterns.remove("text.fa")
     patterns.remove("kVal.txt")
     
-    f = open("MTest-python2.7.txt","w")
+    f = open("MTest3-python2.7.txt","w")
     f.write("textLength\tpatternLength\tk-value\telapsedTime(sec)\n")#\tusedMemory(MB)\n")
     f.close()
     
@@ -270,7 +270,7 @@ if __name__ == "__main__":
         mdi.calculate(k)
         elapsed_time = str(round(time.time() - timeStart,3))
         #used_memory = memory_usage_psutil()
-        printStatisticsToFile("MTest-python2.7.txt", [str(len(B)), str(len(R)), str(k), elapsed_time])#, used_memory])
+        printStatisticsToFile("MTest3-python2.7.txt", [str(len(B)), str(len(R)), str(k), elapsed_time])#, used_memory])
     
     """mdi.computeMAXLENGTH()
     x2 = mdi.MAXLENGTH

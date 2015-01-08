@@ -11,23 +11,6 @@ public class Test {
 	 */
 	public static void main(String[] args) {
 
-		// File folder = new File("C:/Users/Gossamer/Desktop/Texts/");
-		// File[] listOfFiles = folder.listFiles();
-		//
-		//
-		//
-		// String[] texts = new String[listOfFiles.length];
-		//
-		// for (int i = 0; i < texts.length; i++) {
-		// texts[i] = listOfFiles[i].getAbsolutePath();
-		// }
-		//
-		// String pattern = "C:/Users/Gossamer/Desktop/pattern.fa";
-		// String output = "C:/Users/Gossamer/Desktop/output.txt";
-		// int k = 4;
-		//
-		// Tests.performTests(texts, pattern, output, k);
-
 		if (args.length != 3) {
 			System.out.println("Invalid input.\nRequired format is:\n\ttextFilePath patternFilePath k");
 			System.exit(-1);
@@ -53,10 +36,9 @@ public class Test {
 
 		String text = FASTAParser.parseFASTAFile(args[0]).get(0).getSequence();
 		String pattern = FASTAParser.parseFASTAFile(args[1]).get(0).getSequence();
-		
+
 		LVNAlgorithm lvn = new LVNAlgorithm(text, pattern, k);
 		lvn.match();
 
 	}
-
 }

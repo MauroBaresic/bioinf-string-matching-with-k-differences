@@ -1,5 +1,3 @@
-bioinf-string-matching-with-k-differences
-=========================================
 
 An efficient string matching algorithm with k differences for nucleotide and amino acid sequences
 =================================================================================================

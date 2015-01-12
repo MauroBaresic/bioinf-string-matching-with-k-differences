@@ -14,4 +14,4 @@ How to start the program:
 ./start.sh patternFilePath textFilePath k
 
 Example of starting the program:
-./start.sh pattern.txt text.txt 4
+./start.sh pattern5.fa text8.fa 4

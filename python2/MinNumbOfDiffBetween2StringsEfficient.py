@@ -1,5 +1,8 @@
 # author Mauro Baresic
 # email: mauro.baresic@outlook.com
+# An efficient string matching algorithm with k differences
+# for nucleotide and amino acid sequences
+# algorithm authors: Gad M. Landau, Uzi Vishkin, Ruth Nussinov
 
 import sys
 

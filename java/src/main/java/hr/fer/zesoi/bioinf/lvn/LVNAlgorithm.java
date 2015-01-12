@@ -53,15 +53,6 @@ public class LVNAlgorithm {
 	 */
 	private LTable L;
 
-	/**
-	 * Peek memory usage.
-	 */
-	private long peekMemoryUsage = 0;
-
-	/**
-	 * Runtime.
-	 */
-	private Runtime runtime = Runtime.getRuntime();
 
 	/**
 	 * Default constructor for LVNAlgorithm.
@@ -99,7 +90,6 @@ public class LVNAlgorithm {
 		boolean skipOld = false;
 
 		for (int i = 0; i <= limit; i++) {
-			updatePeekMemoryUsage();
 			// System.out.println("Processing index " + i);
 			// [1]
 			L.init();
@@ -157,7 +147,6 @@ public class LVNAlgorithm {
 							}
 						}
 					}
-					updatePeekMemoryUsage();
 					// [4.old]
 					while (!skipOld && row < pattern.length && (i + row + d) < text.length
 							&& pattern[row] == text[i + row + d]) {
@@ -175,11 +164,10 @@ public class LVNAlgorithm {
 						maxJ = i + row + d;
 						newSij = T.get(d);
 					}
-					updatePeekMemoryUsage();
 					// [6]
 					if (L.get(d, e) == pattern.length) {
 						;
-						System.out.println(String.format("%10d%10d%10d", i, (i + row + d), e));
+						System.out.println(String.format("%10d%10d%10d", i, (i + row + d) - 1, e));
 						// L.print();
 						breakOut = true;
 						break;
@@ -200,22 +188,7 @@ public class LVNAlgorithm {
 
 		}
 	}
-
-	/**
-	 * Getter for the peek memory usage.
-	 * 
-	 * @return Peek memory usage in bytes.
-	 */
-	public long getPeekMemoryUsage() {
-		return peekMemoryUsage;
-	};
-
-	/**
-	 * Sets the peek memory usage to 0.
-	 */
-	public void resetPeekMemoryUsage() {
-		peekMemoryUsage = 0;
-	}
+	
 
 	/**
 	 * Method is used to determine which of the three given numbers is greatest.
@@ -234,13 +207,6 @@ public class LVNAlgorithm {
 		return max;
 	}
 
-	/**
-	 * Method is used to update peek memory usage.
-	 */
-	private void updatePeekMemoryUsage() {
-		Long memUsage = runtime.totalMemory() - runtime.freeMemory();
-		peekMemoryUsage = Math.max(peekMemoryUsage, memUsage);
-	}
 
 	/**
 	 * Class is used to represent 2D L table.<br>
@@ -368,6 +334,16 @@ public class LVNAlgorithm {
 		public TList(int k) {
 			T = new TripletList[2 * k + 1];
 			this.k = k;
+			for (int i = 0; i < T.length; i++) {
+				T[i] = new TripletList();
+			}
+		}
+
+		/**
+		 * Initializes TList.<br>
+		 * Can be used to reuse object.
+		 */
+		public void init() {
 			for (int i = 0; i < T.length; i++) {
 				T[i] = new TripletList();
 			}

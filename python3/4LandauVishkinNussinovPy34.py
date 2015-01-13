@@ -22,57 +22,56 @@ result.write(s)
 R = ''
 B = ''
 
-#lines 27-34 and 36-43: parsing of pattern and text file in FASTA format
+#lines 27-30 and 32-35: parsing of pattern and text file in FASTA format
 #and calculating the length of both
-read = 0
-for line in read_pattern.readlines():
-    if (line[0] == '>') and (read == 0):
-        read = 1
-    elif (line[0] != '>') and (read == 1):
-        R = R+line.rstrip()
-read_pattern.close()
+lines = read_pattern.readlines()
+for i in range(1, len(lines)):
+    R = R+lines[i].rstrip()
 m = len(R)
 
-read = 0
-for line in read_text.readlines():
-    if (line[0] == '>') and (read == 0):
-        read = 1
-    elif (line[0] != '>') and (read == 1):
-        B = B+line.rstrip()
-read_text.close()
+lines = read_text.readlines()
+for i in range(1, len(lines)):
+    B = B+lines[i].rstrip()
 n = len(B)
 
-#lines 46-55: pattern analysis -> computing of MAXLENGTH matrix (m x m)
+#lines 38-53: pattern analysis -> computing of MAXLENGTH matrix (m x m)
 MAXLENGTH = [[0 for i in range(m)] for j in range(m)]
-for i in range(m):
-    for j in range(i, m):
-        length = 0
-        for p in range(m-j):
-            if (R[i+p] != R[j+p]):
-                break
-            length = length+1
-        MAXLENGTH[i][j] = length
-        MAXLENGTH[j][i] = length
+for d in range(m):
+    if (R[m-1-d] == R[m-1]):
+        MAXLENGTH[m-1-d][m-1] = 1
+        MAXLENGTH[m-1][m-1-d] = 1
+    else:
+        MAXLENGTH[m-1-d][m-1] = 0
+        MAXLENGTH[m-1][m-1-d] = 0
+for d in range(m):
+    for i in range(m-2-d, -1, -1):
+        if (R[i] == R[i+d]):
+            MAXLENGTH[i][i+d] = 1 + MAXLENGTH[i+1][i+d+1]
+            MAXLENGTH[i+d][i] = 1 + MAXLENGTH[i+d+1][i+1]
+        else:
+            MAXLENGTH[i][i+d] = 0
+            MAXLENGTH[i+d][i] = 0
 
 ### START of Landau-Vishkin-Nussinov algorithm
 
-#lines 60-64: defining starting values of variables for later use
+#lines 58 and 63-65: defining starting values of variables for later use
 S_ij = None     #array of triplets (p,c,f) based on i,j marks:
                 #i is curent starting index in text,
                 #j is index of rightmost symbol from text to which previous iterations of i has come
                 #p is first index of subtext, c is first index of subpattern,
                 #f is number of matches between subtext and subpattern
 newS_ij = None      #used when expanding S_ij
-max_j = 0       #index of rightmost symbol of text to which any iteration of i has come
+max_j = 0       #index of rightmost symbol of text to which current iteration of i has come
+j = 0       #index of rightmost symbol of text to which last iteration of i has come
 
 for i in range(n-m+k+1):
-    #lines 70-71: resetting dictionaries for each iteration of i
+    #lines 69-70: resetting dictionaries for each iteration of i
     L = dict()
     T = dict()
-    #line 73: variable used for printing only one (and the best) solution of current iteration of i
+    #line 72: variable used for printing only one (and the best) solution of current iteration of i
     best_match = 0
     
-    #lines 77-85: initialization of dictionaries
+    #lines 76-84: initialization of dictionaries
     ### 1st step of algorithm 
     for d in range(-(k+1), (k+1)+1):
         L[(d, abs(d)-2)] = -999         #this value represents negative infinity
@@ -84,46 +83,44 @@ for i in range(n-m+k+1):
             L[(d, abs(d)-1)] = -1
             T[(d, abs(d)-1)] = list()
         
-    #line 90: variable e goes from 0 to k differences allowed
-    #line 91: variable d represents diagonals located within e distance from main diagonal in current iteration of i
+    #line 89: variable e goes from 0 to k differences allowed
+    #line 90: variable d represents diagonals located within e distance from main diagonal in current iteration of i
     ### 2nd step of algorithm
     for e in range(k+1):
         for d in range(-e, e+1):
             ### 3rd step of algorithm
             row = max(L[(d, e-1)]+1, L[(d-1, e-1)], L[(d+1, e-1)]+1)
-            old_row = row       #used later in 5th step
+            row_starting = row       #used later in 5th step if value of row changes in current iteration
 
-            #lines 98-105: depending on choice made previously by row = max() function,
+            #lines 97-104: depending on choice made previously by row = max() function,
             #dictionary T is being expanded and/or updated
             if (row == L[(d-1, e-1)]):
                 T[(d, e)] = T[(d-1, e-1)]
-                T[(d, e)].append((i+row+d-1,0,0))
+                T[(d, e)].append((i+row+d-1, 0, 0))
             elif (row == L[(d, e-1)]+1):
                 T[(d, e)] = T[(d, e-1)]
-                T[(d, e)].append((i+row+d-1,0,0))
+                T[(d, e)].append((i+row+d-1, 0, 0))
             elif (row == L[(d+1, e-1)]+1):
                 T[(d, e)] = T[(d+1, e-1)]
                 
             ### 4th NEW step of algorithm
-            #line 110: second and third conditions were added for avoiding "index out of range" errors
+            #line 109: second and third conditions were added for avoiding "index out of range" errors
             done = 0        #variable used insted of GoTo function
             while ((i+row+d+1) <= j) and (row < m) and ((i+row+d) < n):
                 ### 4th NEW.1 step of algorithm
-                #Lines 109-123: take from S_ij triple (p,c,f) which contains simbol from text B[i+row+d]
+                #Lines 112-124: take from S_ij triple (p,c,f) which contains simbol from text B[i+row+d]
                 c = 0
                 f = 0
                 if (S_ij is not None):
                     j = i+row+d
                     for x in range(len(S_ij)):
-                        triple = S_ij[x]
-                        if (j == triple[0]) and (triple[2] == 0):
+                        if (j == S_ij[x][0]) and (S_ij[x][2] == 0):
                             c = f = 0
                             break
                         else:
-                            if (j <= (triple[0]+triple[2])) and (j > triple[0]):
-                                difference = j-triple[0]
-                                c = triple[1]+difference
-                                f = triple[2]-difference
+                            if (j <= (S_ij[x][0]+S_ij[x][2])) and (j > S_ij[x][0]):
+                                c = S_ij[x][1]+j-S_ij[x][0]
+                                f = S_ij[x][2]-j+S_ij[x][0]
                                 break
                             
                 ### 4th NEW.2 step of algorithm
@@ -142,7 +139,7 @@ for i in range(n-m+k+1):
                         row = row+1
 
             if (done == 0):
-                #line 147: first and second conditions were added for avoiding "index out of range" errors
+                #line 144: first and second conditions were added for avoiding "index out of range" errors
                 ### 4th OLD step of alogorithm
                 while (row < m) and ((i+row+d) < n) and (R[row] == B[i+row+d]):
                     row = row+1
@@ -150,15 +147,15 @@ for i in range(n-m+k+1):
             ### 5th step of algorithm
             L[(d,e)] = row
             
-            #lines 154-155: updating of T if row was changed in previous while loop
-            if (old_row < row):
-                T[(d,e)].append((i+old_row+d, old_row, row-old_row))
-            #lines 158-160: remembering max j to which this iteration of i has come
+            #lines 151-152: updating of T if row was changed in previous while loop
+            if (row_starting < row):
+                T[(d,e)].append((i+row_starting+d, row_starting, row-row_starting))
+            #lines 155-157: remembering max j to which this iteration of i has come
             #and preparation for changing S_ij if necessary
             if (i+row+d > max_j):
                 max_j = i+row+d
                 newS_ij = (d,e)
-            #lines 163-165: printing output if match was found (row equals m)
+            #lines 160-162: printing output if match was found (row equals m)
             ### 6th step of algorithm
             if (L[(d,e)] == m) and (best_match == 0):
                 print('start =', i, 'end =', i+m+d-1, 'diff =', e)
@@ -169,10 +166,10 @@ for i in range(n-m+k+1):
         j = max_j
         S_ij = T[newS_ij]
 
-#line 173: ending timestamp; end minus start equals time this algorithm was running
+#line 170: ending timestamp; end minus start equals time this algorithm was running
 end = time.clock()
 
-#line 178: preparing string for writing into file with informations about what was algorithm processing,
+#line 175: preparing string for writing into file with informations about what was algorithm processing,
 #and how much time and memory usage was needed, ordered as follows:
 #length of text, length of pattern, value of k, how long it was running (sec), memory usage (MB)
 s = '{0: <10}{1: <10}{2: <10}{3: <10}{4: <10}\n'.format(str(n), str(m), str(k), \
